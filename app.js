@@ -1,0 +1,144 @@
+const inputBox = document.getElementById("inputBox");
+const addBtn = document.getElementById("addBtn");
+const list = document.getElementById("list");
+const filterButtons = document.querySelectorAll(".filter-btn");
+
+let todos = [];
+let currentFilter = "all";
+
+// ---- LocalStorage ----
+function saveTodos() {
+  localStorage.setItem("todos", JSON.stringify(todos));
+}
+
+function loadTodos() {
+  const stored = localStorage.getItem("todos");
+  if (stored) {
+    todos = JSON.parse(stored);
+  }
+}
+
+// ---- Filtering ----
+function getFilteredTodos() {
+  if (currentFilter === "active") {
+    return todos.filter(t => !t.completed);
+  }
+  if (currentFilter === "completed") {
+    return todos.filter(t => t.completed);
+  }
+  return todos;
+}
+
+// ---- Render ----
+function renderTodos() {
+  list.innerHTML = "";
+
+  const filteredTodos = getFilteredTodos();
+
+  filteredTodos.forEach((todo) => {
+    const index = todos.indexOf(todo);
+    const li = document.createElement("li");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = todo.completed;
+
+    const span = document.createElement("span");
+    span.textContent = todo.text;
+
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "×";
+    delBtn.className = "delete-btn";
+
+    if (todo.completed) {
+      li.classList.add("completed");
+    }
+
+    // Toggle complete
+    checkbox.addEventListener("change", () => {
+      todos[index].completed = checkbox.checked;
+      saveTodos();
+      renderTodos();
+    });
+
+    // Delete
+    delBtn.addEventListener("click", () => {
+      todos.splice(index, 1);
+      saveTodos();
+      renderTodos();
+    });
+
+    // Edit on double-click
+    span.addEventListener("dblclick", () => {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = todo.text;
+      input.className = "edit-input";
+
+      li.replaceChild(input, span);
+      input.focus();
+
+      function saveEdit() {
+        const newValue = input.value.trim();
+        if (newValue) {
+          todos[index].text = newValue;
+          saveTodos();
+        }
+        renderTodos();
+      }
+
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") saveEdit();
+        if (e.key === "Escape") renderTodos();
+      });
+
+      input.addEventListener("blur", saveEdit);
+    });
+
+    li.appendChild(checkbox);
+    li.appendChild(span);
+    li.appendChild(delBtn);
+    list.appendChild(li);
+  });
+}
+
+// ---- Add Todo ----
+function addItem() {
+  const value = inputBox.value.trim();
+  if (!value) return;
+
+  todos.push({
+    text: value,
+    completed: false
+  });
+
+  saveTodos();
+  renderTodos();
+  inputBox.value = "";
+}
+
+// ---- Events ----
+addBtn.addEventListener("click", addItem);
+
+inputBox.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    addItem();
+  }
+});
+
+// Filter buttons
+filterButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    currentFilter = btn.dataset.filter;
+
+    filterButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    renderTodos();
+  });
+});
+
+// ---- Init ----
+loadTodos();
+renderTodos();
