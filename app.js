@@ -34,6 +34,7 @@ themeToggle.addEventListener("change", () => {
   localStorage.setItem("theme", newTheme);
 });
 
+// ---- Todos ----
 function loadTodos() {
   const stored = localStorage.getItem("todos");
   if (stored) {
@@ -68,6 +69,7 @@ function renderTodos() {
   const filteredTodos = getFilteredTodos();
 
   updateStats();
+
   const hasCompleted = todos.some(t => t.completed);
   clearCompletedBtn.style.display = hasCompleted ? "block" : "none";
 
@@ -171,7 +173,6 @@ function addItem() {
 
 // ---- Events ----
 addBtn.addEventListener("click", addItem);
-themeToggleBtn.addEventListener("click", toggleTheme);
 
 clearCompletedBtn.addEventListener("click", () => {
   todos = todos.filter(t => !t.completed);
