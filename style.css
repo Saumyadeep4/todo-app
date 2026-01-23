@@ -4,13 +4,24 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #0f172a;
-  color: #e5e7eb;
   min-height: 100vh;
   margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Light theme (default) */
+body.light {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+/* Dark theme */
+body.dark {
+  background: #0f172a;
+  color: #e5e7eb;
 }
 
 .app {
@@ -241,4 +252,189 @@ li:hover {
 
 .clear-btn:active {
   transform: scale(0.96);
+}
+
+/* --- Theme-aware UI --- */
+
+body.light .app {
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+body.light li {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+body.light .stats-bar,
+body.light .empty-state {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #475569;
+}
+
+body.light .filter-btn {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+body.light .filter-btn.active {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+body.light .clear-btn {
+  background: #fca5a5;
+  color: #7f1d1d;
+}
+
+body.light .clear-btn:hover {
+  background: #f87171;
+}
+
+body.light .delete-btn {
+  color: #dc2626;
+}
+
+body.light .delete-btn:hover {
+  color: #b91c1c;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Dark/Light mode toggle switch */
+.theme-switch {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 20px;
+}
+
+.theme-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.theme-switch .slider {
+  position: absolute;
+  cursor: pointer;
+  background: #ccc;
+  border-radius: 20px;
+  width: 100%;
+  height: 100%;
+  transition: background 0.3s ease;
+}
+
+.theme-switch .slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.theme-switch input:checked + .slider {
+  background: #6366f1;
+}
+
+.theme-switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+/* --- Theme Toggle Switch with Icons --- */
+
+.theme-switch {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 56px;
+  height: 28px;
+}
+
+.theme-switch input {
+  display: none;
+}
+
+.theme-switch .slider {
+  position: relative;
+  cursor: pointer;
+  background: #334155;
+  border-radius: 28px;
+  width: 100%;
+  height: 100%;
+  transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+}
+
+.theme-switch .slider::before {
+  content: "";
+  position: absolute;
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  z-index: 2;
+}
+
+/* Icons */
+.theme-switch .icon {
+  font-size: 13px;
+  z-index: 1;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.theme-switch .icon.moon {
+  color: #cbd5f5;
+}
+
+.theme-switch .icon.sun {
+  color: #fde68a;
+}
+
+/* Checked = light mode */
+.theme-switch input:checked + .slider {
+  background: #6366f1;
+}
+
+.theme-switch input:checked + .slider::before {
+  transform: translateX(28px);
+}
+
+.theme-switch input:checked + .slider .icon.sun {
+  opacity: 1;
+}
+
+.theme-switch input:checked + .slider .icon.moon {
+  opacity: 0.3;
+}
+
+/* Unchecked = dark mode */
+.theme-switch input:not(:checked) + .slider .icon.moon {
+  opacity: 1;
+}
+
+.theme-switch input:not(:checked) + .slider .icon.sun {
+  opacity: 0.3;
 }

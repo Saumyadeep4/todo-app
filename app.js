@@ -5,6 +5,7 @@ const emptyState = document.getElementById("emptyState");
 const statsBar = document.getElementById("statsBar");
 const filterButtons = document.querySelectorAll(".filter-btn");
 const clearCompletedBtn = document.getElementById("clearCompletedBtn");
+const themeToggle = document.getElementById("themeToggle");
 
 let todos = [];
 let currentFilter = "all";
@@ -13,6 +14,25 @@ let currentFilter = "all";
 function saveTodos() {
   localStorage.setItem("todos", JSON.stringify(todos));
 }
+
+// ---- Theme ----
+function loadTheme() {
+  const storedTheme = localStorage.getItem("theme") || "dark";
+
+  document.body.classList.toggle("dark", storedTheme === "dark");
+  document.body.classList.toggle("light", storedTheme === "light");
+
+  themeToggle.checked = storedTheme === "light";
+}
+
+themeToggle.addEventListener("change", () => {
+  const newTheme = themeToggle.checked ? "light" : "dark";
+
+  document.body.classList.toggle("light", themeToggle.checked);
+  document.body.classList.toggle("dark", !themeToggle.checked);
+
+  localStorage.setItem("theme", newTheme);
+});
 
 function loadTodos() {
   const stored = localStorage.getItem("todos");
@@ -151,6 +171,7 @@ function addItem() {
 
 // ---- Events ----
 addBtn.addEventListener("click", addItem);
+themeToggleBtn.addEventListener("click", toggleTheme);
 
 clearCompletedBtn.addEventListener("click", () => {
   todos = todos.filter(t => !t.completed);
@@ -178,5 +199,6 @@ filterButtons.forEach((btn) => {
 });
 
 // ---- Init ----
+loadTheme();
 loadTodos();
 renderTodos();
