@@ -207,3 +207,17 @@ li:hover {
 .filter-btn:hover {
   background: #475569;
 }
+
+/* --- Stats Bar --- */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  font-size: 13px;
+  color: #cbd5f5;
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #020617;
+  border: 1px solid #1e293b;
+}

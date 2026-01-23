@@ -2,6 +2,7 @@ const inputBox = document.getElementById("inputBox");
 const addBtn = document.getElementById("addBtn");
 const list = document.getElementById("list");
 const emptyState = document.getElementById("emptyState");
+const statsBar = document.getElementById("statsBar");
 const filterButtons = document.querySelectorAll(".filter-btn");
 
 let todos = [];
@@ -30,11 +31,22 @@ function getFilteredTodos() {
   return todos;
 }
 
+// ---- Stats ----
+function updateStats() {
+  const total = todos.length;
+  const completed = todos.filter(t => t.completed).length;
+  const active = total - completed;
+
+  statsBar.textContent = `Total: ${total} | Active: ${active} | Completed: ${completed}`;
+}
+
 // ---- Render ----
 function renderTodos() {
   list.innerHTML = "";
 
   const filteredTodos = getFilteredTodos();
+
+  updateStats();
 
   // ---- Empty state toggle ----
   if (filteredTodos.length === 0) {
@@ -70,16 +82,20 @@ function renderTodos() {
       renderTodos();
     });
 
-    // Delete
+    // Delete with animation
     delBtn.addEventListener("click", () => {
-  li.classList.add("todo-exit");
+      li.classList.add("todo-exit");
 
-  li.addEventListener("animationend", () => {
-    todos.splice(index, 1);
-    saveTodos();
-    renderTodos();
-  }, { once: true });
-});
+      li.addEventListener(
+        "animationend",
+        () => {
+          todos.splice(index, 1);
+          saveTodos();
+          renderTodos();
+        },
+        { once: true }
+      );
+    });
 
     // Edit on double-click
     span.addEventListener("dblclick", () => {
