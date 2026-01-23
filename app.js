@@ -4,6 +4,7 @@ const list = document.getElementById("list");
 const emptyState = document.getElementById("emptyState");
 const statsBar = document.getElementById("statsBar");
 const filterButtons = document.querySelectorAll(".filter-btn");
+const clearCompletedBtn = document.getElementById("clearCompletedBtn");
 
 let todos = [];
 let currentFilter = "all";
@@ -47,6 +48,8 @@ function renderTodos() {
   const filteredTodos = getFilteredTodos();
 
   updateStats();
+  const hasCompleted = todos.some(t => t.completed);
+  clearCompletedBtn.style.display = hasCompleted ? "block" : "none";
 
   // ---- Empty state toggle ----
   if (filteredTodos.length === 0) {
@@ -148,6 +151,12 @@ function addItem() {
 
 // ---- Events ----
 addBtn.addEventListener("click", addItem);
+
+clearCompletedBtn.addEventListener("click", () => {
+  todos = todos.filter(t => !t.completed);
+  saveTodos();
+  renderTodos();
+});
 
 inputBox.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {

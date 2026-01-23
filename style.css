@@ -221,3 +221,24 @@ li:hover {
   background: #020617;
   border: 1px solid #1e293b;
 }
+
+/* --- Clear Completed Button --- */
+.clear-btn {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  background: #7c2d12;
+  color: #fde68a;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.clear-btn:hover {
+  background: #9a3412;
+}
+
+.clear-btn:active {
+  transform: scale(0.96);
+}
