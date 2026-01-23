@@ -1,7 +1,11 @@
 const inputBox = document.getElementById("inputBox");
 const addBtn = document.getElementById("addBtn");
 const list = document.getElementById("list");
+const emptyState = document.getElementById("emptyState");
+const statsBar = document.getElementById("statsBar");
 const filterButtons = document.querySelectorAll(".filter-btn");
+const clearCompletedBtn = document.getElementById("clearCompletedBtn");
+const themeToggle = document.getElementById("themeToggle");
 
 let todos = [];
 let currentFilter = "all";
@@ -10,6 +14,25 @@ let currentFilter = "all";
 function saveTodos() {
   localStorage.setItem("todos", JSON.stringify(todos));
 }
+
+// ---- Theme ----
+function loadTheme() {
+  const storedTheme = localStorage.getItem("theme") || "dark";
+
+  document.body.classList.toggle("dark", storedTheme === "dark");
+  document.body.classList.toggle("light", storedTheme === "light");
+
+  themeToggle.checked = storedTheme === "light";
+}
+
+themeToggle.addEventListener("change", () => {
+  const newTheme = themeToggle.checked ? "light" : "dark";
+
+  document.body.classList.toggle("light", themeToggle.checked);
+  document.body.classList.toggle("dark", !themeToggle.checked);
+
+  localStorage.setItem("theme", newTheme);
+});
 
 function loadTodos() {
   const stored = localStorage.getItem("todos");
@@ -29,15 +52,36 @@ function getFilteredTodos() {
   return todos;
 }
 
+// ---- Stats ----
+function updateStats() {
+  const total = todos.length;
+  const completed = todos.filter(t => t.completed).length;
+  const active = total - completed;
+
+  statsBar.textContent = `Total: ${total} | Active: ${active} | Completed: ${completed}`;
+}
+
 // ---- Render ----
 function renderTodos() {
   list.innerHTML = "";
 
   const filteredTodos = getFilteredTodos();
 
+  updateStats();
+  const hasCompleted = todos.some(t => t.completed);
+  clearCompletedBtn.style.display = hasCompleted ? "block" : "none";
+
+  // ---- Empty state toggle ----
+  if (filteredTodos.length === 0) {
+    emptyState.style.display = "block";
+  } else {
+    emptyState.style.display = "none";
+  }
+
   filteredTodos.forEach((todo) => {
     const index = todos.indexOf(todo);
     const li = document.createElement("li");
+    li.classList.add("todo-enter");
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -61,11 +105,19 @@ function renderTodos() {
       renderTodos();
     });
 
-    // Delete
+    // Delete with animation
     delBtn.addEventListener("click", () => {
-      todos.splice(index, 1);
-      saveTodos();
-      renderTodos();
+      li.classList.add("todo-exit");
+
+      li.addEventListener(
+        "animationend",
+        () => {
+          todos.splice(index, 1);
+          saveTodos();
+          renderTodos();
+        },
+        { once: true }
+      );
     });
 
     // Edit on double-click
@@ -119,6 +171,13 @@ function addItem() {
 
 // ---- Events ----
 addBtn.addEventListener("click", addItem);
+themeToggleBtn.addEventListener("click", toggleTheme);
+
+clearCompletedBtn.addEventListener("click", () => {
+  todos = todos.filter(t => !t.completed);
+  saveTodos();
+  renderTodos();
+});
 
 inputBox.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
@@ -140,5 +199,6 @@ filterButtons.forEach((btn) => {
 });
 
 // ---- Init ----
+loadTheme();
 loadTodos();
 renderTodos();
