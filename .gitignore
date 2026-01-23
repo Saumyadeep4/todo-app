@@ -1,2 +1,11 @@
+# OS junk
 .DS_Store
-node_modules
+
+# Dependencies (future-proof)
+node_modules/
+
+# Editor settings
+.vscode/
+
+# Secrets
+.env
