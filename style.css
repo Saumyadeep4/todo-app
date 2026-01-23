@@ -100,9 +100,32 @@ li span {
   color: #ef4444;
 }
 
+li span {
+  position: relative;
+}
+
 li.completed span {
-  text-decoration: line-through;
-  opacity: 0.5;
+  opacity: 0.6;
+}
+
+li.completed span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0%;
+  height: 2px;
+  background: currentColor;
+  animation: strike 0.3s ease forwards;
+}
+
+@keyframes strike {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 li input[type="checkbox"] {
@@ -187,9 +210,14 @@ li.todo-exit {
 /* --- Hover + Focus States --- */
 
 /* Input focus */
+input {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
 input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.45);
+  transform: translateY(-1px);
 }
 
 /* Button press feedback */
@@ -437,4 +465,41 @@ body.light .delete-btn:hover {
 
 .theme-switch input:not(:checked) + .slider .icon.sun {
   opacity: 0.3;
+}
+
+/* --- Theme Toggle Animation Polish --- */
+
+.theme-switch .slider {
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.theme-switch input:checked + .slider {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
+}
+
+.theme-switch .slider::before {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Button Hover Animation --- */
+
+button {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(99, 102, 241, 0.35);
+}
+
+.clear-btn:hover {
+  box-shadow: 0 6px 14px rgba(154, 52, 18, 0.4);
+}
+
+li input[type="checkbox"] {
+  transition: transform 0.12s ease;
+}
+
+li input[type="checkbox"]:active {
+  transform: scale(1.2);
 }
