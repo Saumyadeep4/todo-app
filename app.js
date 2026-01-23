@@ -1,6 +1,7 @@
 const inputBox = document.getElementById("inputBox");
 const addBtn = document.getElementById("addBtn");
 const list = document.getElementById("list");
+const emptyState = document.getElementById("emptyState");
 const filterButtons = document.querySelectorAll(".filter-btn");
 
 let todos = [];
@@ -35,9 +36,17 @@ function renderTodos() {
 
   const filteredTodos = getFilteredTodos();
 
+  // ---- Empty state toggle ----
+  if (filteredTodos.length === 0) {
+    emptyState.style.display = "block";
+  } else {
+    emptyState.style.display = "none";
+  }
+
   filteredTodos.forEach((todo) => {
     const index = todos.indexOf(todo);
     const li = document.createElement("li");
+    li.classList.add("todo-enter");
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -63,10 +72,14 @@ function renderTodos() {
 
     // Delete
     delBtn.addEventListener("click", () => {
-      todos.splice(index, 1);
-      saveTodos();
-      renderTodos();
-    });
+  li.classList.add("todo-exit");
+
+  li.addEventListener("animationend", () => {
+    todos.splice(index, 1);
+    saveTodos();
+    renderTodos();
+  }, { once: true });
+});
 
     // Edit on double-click
     span.addEventListener("dblclick", () => {

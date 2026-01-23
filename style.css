@@ -131,3 +131,44 @@ li input[type="checkbox"] {
 .filter-btn:hover {
   background: #334155;
 }
+
+.empty-state {
+  text-align: center;
+  padding: 16px;
+  color: #94a3b8;
+  font-size: 14px;
+  border: 1px dashed #1e293b;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+/* --- Animations --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+li.todo-enter {
+  animation: fadeIn 0.25s ease-out;
+}
+
+li.todo-exit {
+  animation: fadeOut 0.2s ease-in forwards;
+}
