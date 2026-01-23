@@ -172,3 +172,38 @@ li.todo-enter {
 li.todo-exit {
   animation: fadeOut 0.2s ease-in forwards;
 }
+
+/* --- Hover + Focus States --- */
+
+/* Input focus */
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
+}
+
+/* Button press feedback */
+button:active {
+  transform: scale(0.96);
+}
+
+/* Todo item hover */
+li {
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+li:hover {
+  background: #020617;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Delete button hover */
+.delete-btn:hover {
+  color: #fca5a5;
+  transform: scale(1.15);
+}
+
+/* Filter button hover polish */
+.filter-btn:hover {
+  background: #475569;
+}
