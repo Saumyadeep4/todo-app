@@ -503,3 +503,33 @@ li input[type="checkbox"] {
 li input[type="checkbox"]:active {
   transform: scale(1.2);
 }
+
+/* ------------------------------
+   Search Box
+------------------------------ */
+
+.search-row {
+  margin-bottom: 14px;
+}
+
+#searchBox {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid #1e293b;
+  outline: none;
+  font-size: 14px;
+  background: #020617;
+  color: inherit;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+#searchBox:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.45);
+  transform: translateY(-2px);
+}
+
+body.light #searchBox {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
