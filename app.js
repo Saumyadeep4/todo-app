@@ -6,7 +6,9 @@ const statsBar = document.getElementById("statsBar");
 const filterButtons = document.querySelectorAll(".filter-btn");
 const clearCompletedBtn = document.getElementById("clearCompletedBtn");
 const themeToggle = document.getElementById("themeToggle");
+const searchBox = document.getElementById("searchBox");
 
+let currentSearch = "";
 let todos = [];
 let currentFilter = "all";
 
@@ -44,13 +46,24 @@ function loadTodos() {
 
 // ---- Filtering ----
 function getFilteredTodos() {
+  let result = todos;
+
+  // Filter by status
   if (currentFilter === "active") {
-    return todos.filter(t => !t.completed);
+    result = result.filter(t => !t.completed);
   }
+
   if (currentFilter === "completed") {
-    return todos.filter(t => t.completed);
+    result = result.filter(t => t.completed);
   }
-  return todos;
+
+  // Filter by search text
+  if (currentSearch.trim() !== "") {
+    const q = currentSearch.toLowerCase();
+    result = result.filter(t => t.text.toLowerCase().includes(q));
+  }
+
+  return result;
 }
 
 // ---- Stats ----
@@ -185,6 +198,11 @@ inputBox.addEventListener("keydown", (event) => {
     event.preventDefault();
     addItem();
   }
+});
+
+searchBox.addEventListener("input", (e) => {
+  currentSearch = e.target.value;
+  renderTodos();
 });
 
 // Filter buttons
