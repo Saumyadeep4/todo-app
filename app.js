@@ -8,6 +8,7 @@ const clearCompletedBtn = document.getElementById("clearCompletedBtn");
 const themeToggle = document.getElementById("themeToggle");
 const searchBox = document.getElementById("searchBox");
 
+let dragSrcId = null;
 let currentSearch = "";
 let todos = [];
 let currentFilter = "all";
@@ -40,7 +41,11 @@ themeToggle.addEventListener("change", () => {
 function loadTodos() {
   const stored = localStorage.getItem("todos");
   if (stored) {
-    todos = JSON.parse(stored);
+    todos = JSON.parse(stored).map(t => ({
+      id: t.id || crypto.randomUUID(),
+      text: t.text,
+      completed: t.completed
+    }));
   }
 }
 
@@ -48,7 +53,6 @@ function loadTodos() {
 function getFilteredTodos() {
   let result = todos;
 
-  // Filter by status
   if (currentFilter === "active") {
     result = result.filter(t => !t.completed);
   }
@@ -57,7 +61,6 @@ function getFilteredTodos() {
     result = result.filter(t => t.completed);
   }
 
-  // Filter by search text
   if (currentSearch.trim() !== "") {
     const q = currentSearch.toLowerCase();
     result = result.filter(t => t.text.toLowerCase().includes(q));
@@ -86,7 +89,6 @@ function renderTodos() {
   const hasCompleted = todos.some(t => t.completed);
   clearCompletedBtn.style.display = hasCompleted ? "block" : "none";
 
-  // ---- Empty state toggle ----
   if (filteredTodos.length === 0) {
     emptyState.style.display = "block";
   } else {
@@ -94,9 +96,50 @@ function renderTodos() {
   }
 
   filteredTodos.forEach((todo) => {
-    const index = todos.indexOf(todo);
+    const index = todos.findIndex(t => t.id === todo.id);
+
     const li = document.createElement("li");
     li.classList.add("todo-enter");
+    li.draggable = true;
+
+    li.addEventListener("dragstart", (e) => {
+      dragSrcId = todo.id;
+      li.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", "");
+    });
+
+    li.addEventListener("dragend", () => {
+      li.classList.remove("dragging");
+      dragSrcId = null;
+    });
+
+    li.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      li.classList.add("drag-over");
+    });
+
+    li.addEventListener("dragleave", () => {
+      li.classList.remove("drag-over");
+    });
+
+    li.addEventListener("drop", (e) => {
+      e.preventDefault();
+      li.classList.remove("drag-over");
+
+      if (!dragSrcId || dragSrcId === todo.id) return;
+
+      const fromIndex = todos.findIndex(t => t.id === dragSrcId);
+      const toIndex = todos.findIndex(t => t.id === todo.id);
+
+      if (fromIndex === -1 || toIndex === -1) return;
+
+      const [movedItem] = todos.splice(fromIndex, 1);
+      todos.splice(toIndex, 0, movedItem);
+
+      saveTodos();
+      renderTodos();
+    });
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -113,14 +156,12 @@ function renderTodos() {
       li.classList.add("completed");
     }
 
-    // Toggle complete
     checkbox.addEventListener("change", () => {
       todos[index].completed = checkbox.checked;
       saveTodos();
       renderTodos();
     });
 
-    // Delete with animation
     delBtn.addEventListener("click", () => {
       li.classList.add("todo-exit");
 
@@ -135,7 +176,6 @@ function renderTodos() {
       );
     });
 
-    // Edit on double-click
     span.addEventListener("dblclick", () => {
       const input = document.createElement("input");
       input.type = "text";
@@ -162,8 +202,8 @@ function renderTodos() {
       input.addEventListener("blur", saveEdit);
     });
 
-    li.appendChild(checkbox);
     li.appendChild(span);
+    li.appendChild(checkbox);
     li.appendChild(delBtn);
     list.appendChild(li);
   });
@@ -175,6 +215,7 @@ function addItem() {
   if (!value) return;
 
   todos.push({
+    id: crypto.randomUUID(),
     text: value,
     completed: false
   });
@@ -205,7 +246,6 @@ searchBox.addEventListener("input", (e) => {
   renderTodos();
 });
 
-// Filter buttons
 filterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     currentFilter = btn.dataset.filter;
