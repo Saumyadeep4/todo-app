@@ -533,3 +533,13 @@ body.light #searchBox {
   background: #f8fafc;
   border-color: #e2e8f0;
 }
+
+li.dragging {
+  opacity: 0.5;
+  transform: scale(1.02);
+}
+
+li.drag-over {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
+}
