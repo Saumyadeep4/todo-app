@@ -1,3 +1,5 @@
+let sortMode = "manual";
+
 const inputBox = document.getElementById("inputBox");
 const addBtn = document.getElementById("addBtn");
 const list = document.getElementById("list");
@@ -7,194 +9,153 @@ const filterButtons = document.querySelectorAll(".filter-btn");
 const clearCompletedBtn = document.getElementById("clearCompletedBtn");
 const themeToggle = document.getElementById("themeToggle");
 const searchBox = document.getElementById("searchBox");
+const sortDueBtn = document.getElementById("sortDueBtn");
 
 let dragSrcId = null;
 let currentSearch = "";
-let todos = [];
 let currentFilter = "all";
+let todos = [];
 
-// ---- LocalStorage ----
 function saveTodos() {
   localStorage.setItem("todos", JSON.stringify(todos));
 }
 
-// ---- Theme ----
 function loadTheme() {
-  const storedTheme = localStorage.getItem("theme") || "dark";
-
-  document.body.classList.toggle("dark", storedTheme === "dark");
-  document.body.classList.toggle("light", storedTheme === "light");
-
-  themeToggle.checked = storedTheme === "light";
+  const stored = localStorage.getItem("theme") || "dark";
+  document.body.classList.toggle("dark", stored === "dark");
+  document.body.classList.toggle("light", stored === "light");
+  themeToggle.checked = stored === "light";
 }
 
 themeToggle.addEventListener("change", () => {
-  const newTheme = themeToggle.checked ? "light" : "dark";
-
-  document.body.classList.toggle("light", themeToggle.checked);
-  document.body.classList.toggle("dark", !themeToggle.checked);
-
-  localStorage.setItem("theme", newTheme);
+  const mode = themeToggle.checked ? "light" : "dark";
+  document.body.classList.toggle("light", mode === "light");
+  document.body.classList.toggle("dark", mode === "dark");
+  localStorage.setItem("theme", mode);
 });
 
-// ---- Todos ----
 function loadTodos() {
   const stored = localStorage.getItem("todos");
-  if (stored) {
-    todos = JSON.parse(stored).map(t => ({
-      id: t.id || crypto.randomUUID(),
-      text: t.text,
-      completed: t.completed
-    }));
-  }
+  if (!stored) return;
+
+  todos = JSON.parse(stored).map(t => ({
+    id: t.id || crypto.randomUUID(),
+    text: t.text,
+    completed: t.completed,
+    dueDate: t.dueDate || null
+  }));
 }
 
-// ---- Filtering ----
 function getFilteredTodos() {
   let result = todos;
 
-  if (currentFilter === "active") {
-    result = result.filter(t => !t.completed);
-  }
+  if (currentFilter === "active") result = result.filter(t => !t.completed);
+  if (currentFilter === "completed") result = result.filter(t => t.completed);
 
-  if (currentFilter === "completed") {
-    result = result.filter(t => t.completed);
-  }
-
-  if (currentSearch.trim() !== "") {
+  if (currentSearch.trim()) {
     const q = currentSearch.toLowerCase();
     result = result.filter(t => t.text.toLowerCase().includes(q));
+  }
+
+  if (sortMode === "due") {
+    result = [...result].sort((a, b) => {
+      if (!a.dueDate && !b.dueDate) return 0;
+      if (!a.dueDate) return 1;
+      if (!b.dueDate) return -1;
+      return new Date(a.dueDate) - new Date(b.dueDate);
+    });
   }
 
   return result;
 }
 
-// ---- Stats ----
+sortDueBtn.addEventListener("click", () => {
+  sortMode = sortMode === "manual" ? "due" : "manual";
+  sortDueBtn.textContent = sortMode === "due" ? "Manual Order" : "Sort by Due";
+  sortDueBtn.classList.toggle("active", sortMode === "due");
+  renderTodos();
+});
+
 function updateStats() {
   const total = todos.length;
   const completed = todos.filter(t => t.completed).length;
-  const active = total - completed;
-
-  statsBar.textContent = `Total: ${total} | Active: ${active} | Completed: ${completed}`;
+  statsBar.textContent = `Total: ${total} | Active: ${total - completed} | Completed: ${completed}`;
 }
 
-// ---- Render ----
 function renderTodos() {
   list.innerHTML = "";
 
   const filteredTodos = getFilteredTodos();
-
   updateStats();
 
-  const hasCompleted = todos.some(t => t.completed);
-  clearCompletedBtn.style.display = hasCompleted ? "block" : "none";
+  clearCompletedBtn.style.display = todos.some(t => t.completed) ? "block" : "none";
+  emptyState.style.display = filteredTodos.length ? "none" : "block";
 
-  if (filteredTodos.length === 0) {
-    emptyState.style.display = "block";
-  } else {
-    emptyState.style.display = "none";
-  }
-
-  filteredTodos.forEach((todo) => {
+  filteredTodos.forEach(todo => {
     const index = todos.findIndex(t => t.id === todo.id);
 
     const li = document.createElement("li");
-    li.classList.add("todo-enter");
     li.draggable = true;
 
-    li.addEventListener("dragstart", (e) => {
+    if (todo.completed) li.classList.add("completed");
+
+    if (todo.dueDate && !todo.completed) {
+      const today = new Date();
+      const due = new Date(todo.dueDate);
+      today.setHours(0, 0, 0, 0);
+      due.setHours(0, 0, 0, 0);
+      if (due < today) li.classList.add("overdue");
+      else if (due.getTime() === today.getTime()) li.classList.add("due-today");
+    }
+
+    li.addEventListener("dragstart", e => {
       dragSrcId = todo.id;
-      li.classList.add("dragging");
-      e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("text/plain", "");
     });
 
-    li.addEventListener("dragend", () => {
-      li.classList.remove("dragging");
-      dragSrcId = null;
-    });
-
-    li.addEventListener("dragover", (e) => {
+    li.addEventListener("drop", e => {
       e.preventDefault();
-      li.classList.add("drag-over");
-    });
-
-    li.addEventListener("dragleave", () => {
-      li.classList.remove("drag-over");
-    });
-
-    li.addEventListener("drop", (e) => {
-      e.preventDefault();
-      li.classList.remove("drag-over");
-
       if (!dragSrcId || dragSrcId === todo.id) return;
 
-      const fromIndex = todos.findIndex(t => t.id === dragSrcId);
-      const toIndex = todos.findIndex(t => t.id === todo.id);
+      const from = todos.findIndex(t => t.id === dragSrcId);
+      const to = todos.findIndex(t => t.id === todo.id);
+      if (from === -1 || to === -1) return;
 
-      if (fromIndex === -1 || toIndex === -1) return;
-
-      const [movedItem] = todos.splice(fromIndex, 1);
-      todos.splice(toIndex, 0, movedItem);
+      const [moved] = todos.splice(from, 1);
+      todos.splice(to, 0, moved);
 
       saveTodos();
       renderTodos();
     });
 
+    li.addEventListener("dragover", e => e.preventDefault());
+
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = todo.completed;
-
-    const span = document.createElement("span");
-    span.textContent = todo.text;
-
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "×";
-    delBtn.className = "delete-btn";
-
-    if (todo.completed) {
-      li.classList.add("completed");
-    }
-
     checkbox.addEventListener("change", () => {
       todos[index].completed = checkbox.checked;
       saveTodos();
       renderTodos();
     });
 
-    delBtn.addEventListener("click", () => {
-      li.classList.add("todo-exit");
-
-      li.addEventListener(
-        "animationend",
-        () => {
-          todos.splice(index, 1);
-          saveTodos();
-          renderTodos();
-        },
-        { once: true }
-      );
-    });
-
+    const span = document.createElement("span");
+    span.textContent = todo.text;
     span.addEventListener("dblclick", () => {
       const input = document.createElement("input");
-      input.type = "text";
       input.value = todo.text;
       input.className = "edit-input";
-
       li.replaceChild(input, span);
       input.focus();
 
       function saveEdit() {
-        const newValue = input.value.trim();
-        if (newValue) {
-          todos[index].text = newValue;
-          saveTodos();
-        }
+        const value = input.value.trim();
+        if (value) todos[index].text = value;
+        saveTodos();
         renderTodos();
       }
 
-      input.addEventListener("keydown", (e) => {
+      input.addEventListener("keydown", e => {
         if (e.key === "Enter") saveEdit();
         if (e.key === "Escape") renderTodos();
       });
@@ -202,14 +163,44 @@ function renderTodos() {
       input.addEventListener("blur", saveEdit);
     });
 
-    li.appendChild(span);
-    li.appendChild(checkbox);
-    li.appendChild(delBtn);
+    const dateBtn = document.createElement("button");
+    dateBtn.className = "due-date-btn";
+    dateBtn.textContent = todo.dueDate
+      ? new Date(todo.dueDate).toLocaleDateString()
+      : "Add date";
+
+    dateBtn.addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "date";
+      input.value = todo.dueDate || "";
+      input.className = "date-input";
+      li.replaceChild(input, dateBtn);
+      input.focus();
+
+      function saveDate() {
+        todos[index].dueDate = input.value || null;
+        saveTodos();
+        renderTodos();
+      }
+
+      input.addEventListener("change", saveDate);
+      input.addEventListener("blur", saveDate);
+    });
+
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "×";
+    delBtn.className = "delete-btn";
+    delBtn.addEventListener("click", () => {
+      todos.splice(index, 1);
+      saveTodos();
+      renderTodos();
+    });
+
+    li.append(span, checkbox, dateBtn, delBtn);
     list.appendChild(li);
   });
 }
 
-// ---- Add Todo ----
 function addItem() {
   const value = inputBox.value.trim();
   if (!value) return;
@@ -217,7 +208,8 @@ function addItem() {
   todos.push({
     id: crypto.randomUUID(),
     text: value,
-    completed: false
+    completed: false,
+    dueDate: null
   });
 
   saveTodos();
@@ -225,7 +217,6 @@ function addItem() {
   inputBox.value = "";
 }
 
-// ---- Events ----
 addBtn.addEventListener("click", addItem);
 
 clearCompletedBtn.addEventListener("click", () => {
@@ -234,30 +225,24 @@ clearCompletedBtn.addEventListener("click", () => {
   renderTodos();
 });
 
-inputBox.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    addItem();
-  }
+inputBox.addEventListener("keydown", e => {
+  if (e.key === "Enter") addItem();
 });
 
-searchBox.addEventListener("input", (e) => {
+searchBox.addEventListener("input", e => {
   currentSearch = e.target.value;
   renderTodos();
 });
 
-filterButtons.forEach((btn) => {
+filterButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     currentFilter = btn.dataset.filter;
-
     filterButtons.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-
     renderTodos();
   });
 });
 
-// ---- Init ----
 loadTheme();
 loadTodos();
 renderTodos();
