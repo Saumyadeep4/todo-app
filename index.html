@@ -7,13 +7,15 @@
 </head>
 <body>
   <div class="app">
+
     <label class="theme-switch">
       <input type="checkbox" id="themeToggle">
-        <span class="slider">
-          <span class="icon moon">🌙</span>
-          <span class="icon sun">☀️</span>
-        </span>
+      <span class="slider">
+        <span class="icon moon">🌙</span>
+        <span class="icon sun">☀️</span>
+      </span>
     </label>
+
     <h1>My Todo List</h1>
 
     <div class="input-row">
@@ -21,34 +23,30 @@
       <button id="addBtn">Add</button>
     </div>
 
-    <div class="search-row">
-      <input
-        type="text"
-        id="searchBox"
-        placeholder="Search todos…"
-        autocomplete="off"
-      />
+    <input id="searchBox" placeholder="Search todos…" />
+
+    <div class="sort-row">
+      <button id="sortDueBtn" class="sort-btn">Sort by Due</button>
     </div>
 
-    <!-- Filters -->
     <div class="filters">
       <button data-filter="all" class="filter-btn active">All</button>
       <button data-filter="active" class="filter-btn">Active</button>
       <button data-filter="completed" class="filter-btn">Completed</button>
     </div>
 
-    <div id="statsBar" class="stats-bar">
-      Total: 0 | Active: 0 | Completed: 0
-    </div>
+    <div id="statsBar" class="stats-bar"></div>
 
     <button id="clearCompletedBtn" class="clear-btn">
       Clear Completed
     </button>
 
     <div id="emptyState" class="empty-state">
-        No todos yet. Add one above.
+      No todos yet. Add one above.
     </div>
+
     <ul id="list"></ul>
+
   </div>
 
   <script src="app.js"></script>
