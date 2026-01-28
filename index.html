@@ -8,6 +8,7 @@
 <body>
   <div class="app">
 
+    <!-- Theme Toggle -->
     <label class="theme-switch">
       <input type="checkbox" id="themeToggle">
       <span class="slider">
@@ -18,42 +19,62 @@
 
     <h1>My Todo List</h1>
 
+    <!-- Add Todo -->
     <div class="input-row">
       <input id="inputBox" placeholder="Add a new todo..." />
       <button id="addBtn">Add</button>
     </div>
 
+    <!-- Search -->
     <input id="searchBox" placeholder="Search todos…" />
 
-    <div class="sort-row">
-      <button id="sortDueBtn" class="sort-btn">Sort by Due</button>
-      <button id="sortPriorityBtn" class="sort-btn">Sort by Priority</button>
-    </div>
-
-    <div class="priority-filters">
-      <button class="priority-filter-btn active" data-priority="all">All</button>
-      <button class="priority-filter-btn" data-priority="high">High</button>
-      <button class="priority-filter-btn" data-priority="medium">Medium</button>
-      <button class="priority-filter-btn" data-priority="low">Low</button>
-    </div>
-
-
+    <!-- Status Filters -->
     <div class="filters">
       <button data-filter="all" class="filter-btn active">All</button>
       <button data-filter="active" class="filter-btn">Active</button>
       <button data-filter="completed" class="filter-btn">Completed</button>
     </div>
 
+    <!-- Advanced Toggle -->
+    <button id="advancedToggleBtn" class="advanced-toggle-btn">
+      ⚙ Filters
+    </button>
+
+    <!-- Advanced Panel -->
+    <div id="advancedPanel" class="advanced-panel hidden">
+
+      <!-- Priority Filters -->
+      <div class="priority-filters">
+        <button class="priority-filter-btn active" data-priority="all">All</button>
+        <button class="priority-filter-btn" data-priority="high">High</button>
+        <button class="priority-filter-btn" data-priority="medium">Medium</button>
+        <button class="priority-filter-btn" data-priority="low">Low</button>
+      </div>
+
+      <!-- Sort Buttons -->
+      <div class="sort-row">
+        <button id="sortDueBtn" class="sort-btn">Sort by Due</button>
+        <button id="sortPriorityBtn" class="sort-btn">Sort by Priority</button>
+      </div>
+
+      <!-- (Future: Focus Mode goes here) -->
+
+    </div>
+
+    <!-- Stats -->
     <div id="statsBar" class="stats-bar"></div>
 
+    <!-- Clear Completed -->
     <button id="clearCompletedBtn" class="clear-btn">
       Clear Completed
     </button>
 
+    <!-- Empty State -->
     <div id="emptyState" class="empty-state">
       No todos yet. Add one above.
     </div>
 
+    <!-- Todo List -->
     <ul id="list"></ul>
 
   </div>

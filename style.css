@@ -771,3 +771,42 @@ li input[type="checkbox"] {
 .priority-filter-btn:hover {
   background: #334155;
 }
+
+/* ------------------------------
+   Advanced Controls Panel
+------------------------------ */
+
+.advanced-toggle-btn {
+  width: 100%;
+  margin-bottom: 10px;
+  background: #1e293b;
+  color: #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.advanced-panel {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 14px;
+  display: none;
+}
+
+.advanced-panel.visible {
+  display: block;
+}
+
+/* ------------------------------
+   Search + Filters Spacing Fix
+------------------------------ */
+
+#searchBox {
+  margin-bottom: 12px;
+}
+
+.advanced-toggle-btn {
+  margin-top: 4px;
+  margin-bottom: 14px;
+}
